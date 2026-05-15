@@ -702,6 +702,7 @@ pl:
       download_your_data_export:
         click_button_html: Kliknij poniższy link, aby pobrać swoje dane.<br/>Plik będzie dostępny do pobrania do %{date}.
         download: Pobierz
+        export_not_found: Eksport, do którego próbujesz uzyskać dostęp, nie istnieje albo nie masz uprawnień do jego pobrania
       data_portability_export:
         click_button: 'Kliknij poniższy przycisk, aby pobrać swoje dane. <br/>Plik będzie dostępny do %{date}. <br/>Będziesz potrzebował <a href=''https://www.7-zip.org/''>7-Zip</a> do otwarcia pliku. Hasło: %{password}'
         download: Pobieranie
