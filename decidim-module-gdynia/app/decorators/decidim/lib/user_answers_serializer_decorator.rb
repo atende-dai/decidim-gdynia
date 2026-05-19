@@ -58,11 +58,12 @@ Decidim::Forms::UserAnswersSerializer.class_eval do
     questionnaire_id = @answers.first&.decidim_questionnaire_id
     return {} unless questionnaire_id
 
-    questions = Decidim::Forms::Question.where(decidim_questionnaire_id: questionnaire_id)
+    questions = Decidim::Forms::Question.where(decidim_questionnaire_id: questionnaire_id).order(:position)
+    questions = questions.not_separator.not_title_and_description
     return {} if questions.none?
 
     lp = -1 # because question_key adds +1 for numbering
-    questions.not_separator.not_title_and_description.order(:position).each.inject({}) do |serialized, question|
+    questions.each.inject({}) do |serialized, question|
       idx = question.position
       lp += 1
 
@@ -104,7 +105,9 @@ Decidim::Forms::UserAnswersSerializer.class_eval do
   # remove question number unless automatic_question_numbering is on
   def question_key(idx, question, matrix_row = nil, answer_option = nil)
     text = [question, matrix_row, answer_option].compact.map { |item| translated_attribute(item.body) }.join(" - ")
-    automatic_question_numbering? ? "#{idx + 1}. #{text}" : text
+    # FIX: questions keys must be unique, so we cant remove numbering
+    # automatic_question_numbering? ? "#{idx + 1}. #{text}" : text
+    "#{idx + 1}. #{text}"
   end
 
   # question key fixed for proper ordered question positioning
