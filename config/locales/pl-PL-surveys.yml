@@ -102,7 +102,8 @@ pl:
             open: Otwarta
       surveys:
         answer:
-          invalid: Podczas wypełniania ankiety wystąpił błąd.
+          # invalid: Podczas wypełniania ankiety wystąpił błąd.
+          invalid: Nie udzielono odpowiedzi na pytanie obowiązkowe. Proszę je uzupełnić przed wysłaniem ankiety.
           spam_detected: Wystąpił błąd podczas wypełniania formularza. Być może zostało to zrobione zbyt szybko, czy możesz spróbować ponownie?
           success: Twoja ankieta została wypełniona.
         count:
