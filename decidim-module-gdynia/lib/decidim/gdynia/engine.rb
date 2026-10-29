@@ -71,6 +71,32 @@ module Decidim
       initializer "Gdynia.webpacker.assets_path" do
         Decidim.register_assets_path File.expand_path("app/packs", root)
       end
+
+      # Fix: The survey_user_answers export in decidim-surveys ignores the resource_id parameter
+      # and always exports answers from the first survey found in the component.
+      # Use after_initialize to ensure SanitizeHelper is loaded before accessing export_manifests,
+      # because exports.formats includes FormPDF which inherits from PDF that includes SanitizeHelper.
+      config.after_initialize do
+        manifest = Decidim.find_component_manifest("surveys")
+        next unless manifest
+
+        export_manifest = manifest.export_manifests.find { |m| m.name == :survey_user_answers }
+        next unless export_manifest
+
+        export_manifest.collection do |component, _user, resource_id|
+          if resource_id.present?
+            questionnaire = Decidim::Forms::Questionnaire.find(resource_id)
+            Decidim::Forms::QuestionnaireUserAnswers.for(questionnaire)
+          else
+            survey = Decidim::Surveys::Survey.find_by(component: component)
+            if survey&.questionnaire
+              Decidim::Forms::QuestionnaireUserAnswers.for(survey.questionnaire)
+            else
+              []
+            end
+          end
+        end
+      end
     end
   end
 end

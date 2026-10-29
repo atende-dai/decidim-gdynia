@@ -30,34 +30,6 @@ module Decidim
       initializer "surveys_extended.webpacker.assets_path" do
         Decidim.register_assets_path File.expand_path("app/packs", root)
       end
-
-      # Fix: The survey_user_answers export in decidim-surveys ignores the resource_id parameter
-      # and always exports answers from the first survey found in the component.
-      initializer "surveys_extended.fix_survey_export" do
-        manifest = Decidim.find_component_manifest("surveys")
-        next unless manifest
-
-        export_manifest = manifest.export_manifests.find { |m| m.name == :survey_user_answers }
-        next unless export_manifest
-
-        export_manifest.collection do |component, _user, resource_id|
-          if resource_id.present?
-            survey = Decidim::Surveys::Survey.find_by(decidim_component_id: component.id, id: resource_id)
-            if survey&.questionnaire
-              Decidim::Forms::QuestionnaireUserAnswers.for(survey.questionnaire)
-            else
-              []
-            end
-          else
-            survey = Decidim::Surveys::Survey.find_by(component: component)
-            if survey&.questionnaire
-              Decidim::Forms::QuestionnaireUserAnswers.for(survey.questionnaire)
-            else
-              []
-            end
-          end
-        end
-      end
     end
   end
 end
